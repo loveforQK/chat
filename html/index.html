@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+</head>
+<body>
+<div class="wrap">
+    <div class="rain"><canvas id="canvas">请使用高版本浏览器，IE8以及一下不支持canvas</canvas></div>
+    <div class="row">
+        <div class="col-lg-4 left">
+            <div class="panel folder">
+                <i class="glyphicon glyphicon-folder-open"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <i class="glyphicon glyphicon-file"></i>
+                <i class="glyphicon glyphicon-file"></i>
+                <i class="glyphicon glyphicon-file"></i>
+                <i class="glyphicon glyphicon-file"></i>
+            </div>
+        </div>
+        <div class="col-lg-4 center">
+            <div class="panel">
+                <div class="chat_list">
+                    <ul>
+                        <li><span>Tom:</span>hello my boss</li>
+                    </ul>
+                </div>
+                <input type="text" class="chat_input" placeholder="please input your message"/>
+            </div>
+        </div>
+        <div class="col-lg-4 right">
+            <div class="panel">
+                12121
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mask"></div>
+<div class="modalbox">
+    <div class="login panel">
+        <input type="text" class="username" placeholder="Username" />
+        <input type="password" class="password" placeholder="Password" />
+    </div>
+</div>
+<div class="modalbox none">
+    <div class="loading panel">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+<script src="./js/jquery-3.2.1.min.js"></script>
+<script src="./js/common.js"></script>
+</body>
+</html>

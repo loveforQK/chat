@@ -1,0 +1,17 @@
+body{background: #000000;padding:0;margin:0;overflow: hidden;}
+.none{display:none;}
+.mask{left:0;top:0;bottom:0;right:0;z-index:1000;background: #000;position:fixed;display: block;}
+.modalbox{width:100%;z-index:1001;position: absolute;top:200px;}
+.panel{background: #000;border:2px solid #0f0;border-top-width: 20px;border-radius: 0;overflow: hidden;padding:0;}
+.login{width:500px;margin:0 auto;padding:20px 10px;}
+.login input{border:none;background: #666;height:40px;padding:0 10px;width:155px;margin-left:50px}
+.folder .glyphicon{font-size:48px;color:#0f0;margin:27px;display:none;float:left;}
+.folder{height: 500px;}
+.chat_list{height:440px;color:#0f0;overflow: hidden;}
+.chat_input{background: #333;color:#0f0; border:none;height:40px;width: 100%;line-height:40px;padding:0 10px;}
+.chat_list ul{margin:0;padding:0;}
+.chat_list ul li{padding:10px;}
+.chat_list ul li span{font-weight:bold;margin-right:10px;}
+.loading{width:260px;margin:0 auto;}
+.loading span{width:18px;height:40px;border:1px solid #0f0;margin:3px;display: block;float:left;}
+.loading span.active{background: #0f0;}
