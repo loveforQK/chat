@@ -1,45 +1,112 @@
-$(document).ready(function(){
-    var folder_index = 0;
+//全局变量
+var wait_timer,folder_index = 0,wsUrl = 'ws://localhost:1234/',websocket,username = '';
 
-    $('.password').on('keydown',function(e){
-        if(e.keyCode == 13){
-            $(this).parents('.modalbox').animate({"margin-top":"-400px"});
-
-            var timer1 = setInterval(function(){
-                var i = $('.loading span.active').length;
-                if(i == 10){
-                    $('.loading span.active').removeClass('active');
-                    i = 0;
-                }
-                $('.loading span').eq(i).addClass('active');
-            },500);
-
-            $.post('/api/login',{},function(data){
-
-            });
-
-            $('.mask').hide();
-        }
-    });
-
-    start_rain();
-
-    var timer = setInterval(show_folder,500);
-
-    $('.chat_input').on('keydown',function(e){
-        if(e.keyCode == 13){
-            var val = $.trim($(this).val());
-            if(val == ''){
-                return false;
+//事件定义
+$.tools = {
+    //初始化
+    init:function(){
+        //判断是否登录
+        $.getJSON('/api/islogin',{},function(data){
+            if(data.code == 1){
+                username = data.name;
+                $.tools.show_loading();
+            }else{
+                $('#login_box').show();
             }
-            say('I',val);
-            $(this).val('');
+        });
+    },
+    //登录
+    login:function(){
+        var name = $.trim($('.username').val()),pwd = $.trim($('.password').val()),obj = $(this);
+        if(name == '' || pwd == ''){
+            $('#login_box .panel').addClass('danger');
+            return false;
         }
-    });
 
-    function start_rain(){
-        var width,height,
-            canvas = document.getElementById("canvas");
+        $.post('/api/login',{name:name,pwd:pwd},function(data){
+            if(data.code == 1){
+                username = name;
+                $('#login_box').animate({"margin-top":"-400px"});
+                $.tools.show_loading();
+            }else{
+                $('#login_box .panel').addClass('danger');
+            }
+        });
+    },
+    //加载显示
+    show_loading:function(){
+        //开始建立连接
+        websocket = new WebSocket(wsUrl);
+
+        websocket.onmessage = function(e){
+            var data = JSON.parse(e.data);
+            switch(data.type){
+                case 'say':
+                    $.tools.say(data.user,data.msg);
+                    break;
+                case 'online':
+                    if($('.userlist #u_'+data.user).length == 0){
+                        $('.userlist').append('<span id="u_'+data.user+'"><i class="glyphicon glyphicon-user"></i>'+data.user+'</span>');
+                    }
+                    break;
+                case 'offline':
+                    $('.userlist #u_'+data.user).addClass('danger').fadeOut(2000,function(){
+                        $(this).remove();
+                    });
+                    break;
+                case 'users':
+                    $.each(data.list,function(k,v){
+                        $('.userlist').append('<span id="u_'+v+'"><i class="glyphicon glyphicon-user"></i>'+v+'</span>');
+                    });
+                    break;
+                case 'error':
+                    $('.mask').show();
+                    alert(data.msg);
+                    break;
+                default:
+                    alert('Error');
+                    break;
+            }
+        };
+
+        websocket.onerror = function(e){
+            alert('Error');
+        };
+
+        //显示进度条
+        $('#wait_box').show();
+        wait_timer = setInterval(function(){
+            var i = $('#wait_box span.active').length;
+            if(i == 10){
+                $('#wait_box span.active').removeClass('active');
+                i = 0;
+            }
+            $('#wait_box span').eq(i).addClass('active');
+        },100);
+
+        setTimeout(function(){
+            clearInterval(wait_timer);
+
+            $('#wait_box').hide();
+            $('.mask').hide();
+
+            //开始下雨
+            $.tools.start_rain();
+
+            //开始循环目录
+            var timer1 = setInterval(function(){
+                $('.folder .glyphicon').eq(folder_index).css('display','block');
+                folder_index++;
+                if(folder_index == $('.folder .glyphicon').length){
+                    folder_index = 0;
+                    $('.folder .glyphicon').hide();
+                }
+            },500);
+        },3000);
+    },
+    //黑客雨
+    start_rain:function(){
+        var width,height,canvas = document.getElementById("canvas");
         canvas.width = width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         canvas.height = height = 400;
         var ctx = canvas.getContext('2d');
@@ -66,22 +133,37 @@ $(document).ready(function(){
         ;(function(){
             setInterval(draw, 100);
         })();
-    }
-
-    function show_folder(){
-        $('.folder .glyphicon').eq(folder_index).css('display','block');
-        folder_index++;
-        if(folder_index == $('.folder .glyphicon').length){
-            folder_index = 0;
-            $('.folder .glyphicon').hide();
-        }
-    }
-
-    function say(user,msg){
+    },
+    //发表
+    say:function(user,msg){
         $('.chat_list ul').append('<li><span>'+user+':</span>'+msg+'</li>');
         var step = $('.chat_list ul li').length - 11;
         if(step > 0){
             $('.chat_list ul').animate({"margin-top":-40*step});
         }
-    }
+    },
+};
+//事件执行
+$(document).ready(function(){
+    //初始化
+    $.tools.init();
+
+    //密码输入框enter
+    $('.password').on('keydown',function(e){
+        if(e.keyCode == 13){
+            $.tools.login();
+        }
+    });
+
+    $('.chat_input').on('keydown',function(e){
+        if(e.keyCode == 13){
+            var msg = $.trim($(this).val());
+            if(msg == ''){
+                return false;
+            }
+            $(this).val('');
+
+            websocket.send(msg);
+        }
+    });
 });

@@ -1,49 +1,51 @@
 <?php
-$pid_path = "./runtime/pid.txt";//进程ID文件
-$web_root = "./html/";//站点资源目录
-$content_type = ['html'=>'text/html','js'=>'application/javascript','css'=>'text/css'];//资源输出类型
+require_once './common.php';
 
-$http = new swoole_http_server('0.0.0.0',80);
+class Web{
+    private static $_instance;
 
-$http->set([
-    'worker_num' => 1,
-    'daemonize ' => false
-]);
+    public static function run(){
+        global $app_path;
 
-$http->on('start',function($server){
-    global $pid_path;
-    file_put_contents($pid_path,$server->master_pid);
-});
+        self::$_instance = new swoole_http_server('0.0.0.0',8080);
 
-$http->on('request',function($request, $response){
-    global $web_root,$content_type;
+        //参数配置
+        self::$_instance->set([
+            'worker_num' => 1,
+            'daemonize ' => false
+        ]);
 
-    $filename = substr($request->server['request_uri'],1);
-    if(empty($filename)){
-        $filename = 'index.html';
-        $ext = 'html';
-    }else{
-        $ext  = pathinfo($filename,PATHINFO_EXTENSION);
-        $last = substr($filename,-1);
-        if($ext == ''){
-            $ext = 'html';
-            $filename .= ($last == '/')?'index.html':'/index.html';
-        }
+        //开启进程
+        self::$_instance->on('start',function($server)use($app_path){
+            //文件保存进程ID，方便平滑重启
+            file_put_contents($app_path.DIRECTORY_SEPARATOR.'runtime'.DIRECTORY_SEPARATOR.'web_pid.log',$server->master_pid);
+        });
+
+        //接受请求处理
+        self::$_instance->on('request',function($request, $response)use($app_path){
+            //实例化全局类
+            $controller = new lib\WebResponse($request);
+
+            //判断客户端session是否存在
+            if(!$controller->chechSessionId()){
+                $response->cookie('SID',$controller->getSessionId(),time()+86400);
+            }
+
+            //业务处理
+            $result = $controller->deal();
+
+            //设置相应头信息
+            $response->status($controller->status_code);
+            $response->header('Content-Type',$controller->content_type[$controller->type]);
+            unset($controller);
+
+            //发送结果
+            $response->end($result);
+        });
+
+        //启动服务
+        self::$_instance->start();
     }
-    if(!isset($content_type[$ext])){
-        $ext = 'html';
-    }
+}
 
-    //判断文件是否存在
-    $file = $web_root.$filename;
-
-    if(!file_exists($file)){
-        $response->status(404);
-        $response->end('<h2>404 Not Found</h2>');
-    }else{
-        $response->header('Content-Type',$content_type[$ext]);
-        $response->end(file_get_contents($file));
-    }
-});
-
-$http->start();
+Web::run();
