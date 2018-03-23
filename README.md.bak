@@ -10,4 +10,3 @@ php server.php<br>
 <br>
 浏览器访问 http://localhost:8080 就可以<br>
 <br>
-\lib\WebResponse.php文件中可以设置登录账户密码

@@ -65,12 +65,15 @@ class Server{
                 if($fd == $request->fd || $fd == $old_fd){
                     continue;
                 }
-                $server->push($fd,json_encode(['type'=>'online','user'=>$name]));
 
                 $temp = $server->table->get('i_'.$fd)['value'];
-                if(!empty($temp)){
-                    $list[] = $temp;
+                if(empty($temp)){
+                    continue;
                 }
+
+                //仅推送在线用户
+                $server->push($fd,json_encode(['type'=>'online','user'=>$name]));
+                $list[] = $temp;
 
             }
             $list[] = $name;
@@ -105,11 +108,21 @@ class Server{
 
         //关闭连接-单进程
         self::$_instance->on('close',function($server, $fd){
+            $user = $server->table->get('i_'.$fd)['value'];
+            $old_fd = $server->table->get('u_'.$user)['value'];
+
+            //如果用户已创建新连接 就不需要删除，
+            if($old_fd == $fd){
+                $server->table->del('u_'.$user);
+            }
+            //删除连接标识
+            $server->table->del('i_'.$fd);
+
             foreach($server->connections  as $v) {
                 if($fd == $v){
                     continue;
                 }
-                $server->push($v,json_encode(['type'=>'offline','user'=>$server->table->get('i_'.$fd)['value']]));
+                $server->push($v,json_encode(['type'=>'offline','user'=>$user]));
             }
         });
 
