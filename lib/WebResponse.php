@@ -17,8 +17,16 @@ class WebResponse{
         'api/login'=>'api_login'
     ];
     private $userlist = [
-        'xull'=>'111111',
-        'admin'=>'111111',
+        'admin1'=>'111111',
+        'admin2'=>'111111',
+        'admin3'=>'111111',
+        'admin4'=>'111111',
+        'admin5'=>'111111',
+        'admin6'=>'111111',
+        'admin7'=>'111111',
+        'admin8'=>'111111',
+        'admin9'=>'111111',
+        'admin10'=>'111111',
     ];
     private $server = null;
     private $post = null;
@@ -30,10 +38,10 @@ class WebResponse{
         global $app_path;
         $this->html_path = $app_path.DIRECTORY_SEPARATOR.'html';
         $this->session_path = $app_path.DIRECTORY_SEPARATOR.'runtime'.DIRECTORY_SEPARATOR.'session';
-        $this->server = $request->server;
-        $this->post = $request->post;
-        $this->get = $request->get;
-        $this->cookie = $request->cookie;
+        $this->server = isset($request->server)?$request->server:[];
+        $this->get = isset($request->get)?$request->get:[];
+        $this->cookie = isset($request->cookie)?$request->cookie:[];
+        $this->post = isset($request->post)?$request->post:[];
     }
 
     public function deal(){

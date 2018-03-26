@@ -12,13 +12,13 @@ class Web{
         //参数配置
         self::$_instance->set([
             'worker_num' => 1,
-            'daemonize ' => false
+            'daemonize ' => 1,
+            'pid_file'=>$app_path.DIRECTORY_SEPARATOR.'runtime'.DIRECTORY_SEPARATOR.'web.pid',
         ]);
 
         //开启进程
         self::$_instance->on('start',function($server)use($app_path){
-            //文件保存进程ID，方便平滑重启
-            file_put_contents($app_path.DIRECTORY_SEPARATOR.'runtime'.DIRECTORY_SEPARATOR.'web_pid.log',$server->master_pid);
+
         });
 
         //接受请求处理

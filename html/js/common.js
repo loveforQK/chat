@@ -35,44 +35,6 @@ $.tools = {
     },
     //加载显示
     show_loading:function(){
-        //开始建立连接
-        websocket = new WebSocket(wsUrl);
-
-        websocket.onmessage = function(e){
-            var data = JSON.parse(e.data);
-            switch(data.type){
-                case 'say':
-                    $.tools.say(data.user,data.msg);
-                    break;
-                case 'online':
-                    if($('.userlist #u_'+data.user).length == 0){
-                        $('.userlist').append('<span id="u_'+data.user+'"><i class="glyphicon glyphicon-user"></i>'+data.user+'</span>');
-                    }
-                    break;
-                case 'offline':
-                    $('.userlist #u_'+data.user).addClass('danger').fadeOut(2000,function(){
-                        $(this).remove();
-                    });
-                    break;
-                case 'users':
-                    $.each(data.list,function(k,v){
-                        $('.userlist').append('<span id="u_'+v+'"><i class="glyphicon glyphicon-user"></i>'+v+'</span>');
-                    });
-                    break;
-                case 'error':
-                    $('.mask').show();
-                    alert(data.msg);
-                    break;
-                default:
-                    alert('Error');
-                    break;
-            }
-        };
-
-        websocket.onerror = function(e){
-            alert('Error');
-        };
-
         //显示进度条
         $('#wait_box').show();
         wait_timer = setInterval(function(){
@@ -102,6 +64,44 @@ $.tools = {
                     $('.folder .glyphicon').hide();
                 }
             },500);
+
+            //开始建立连接
+            websocket = new WebSocket(wsUrl);
+
+            websocket.onmessage = function(e){
+                var data = JSON.parse(e.data);
+                switch(data.type){
+                    case 'say':
+                        $.tools.say(data.user,data.msg);
+                        break;
+                    case 'online':
+                        if($('.userlist #u_'+data.user).length == 0){
+                            $('.userlist').append('<span id="u_'+data.user+'"><i class="glyphicon glyphicon-user"></i>'+data.user+'</span>');
+                        }
+                        break;
+                    case 'offline':
+                        $('.userlist #u_'+data.user).addClass('danger').fadeOut(2000,function(){
+                            $(this).remove();
+                        });
+                        break;
+                    case 'users':
+                        $.each(data.list,function(k,v){
+                            $('.userlist').append('<span id="u_'+v+'"><i class="glyphicon glyphicon-user"></i>'+v+'</span>');
+                        });
+                        break;
+                    case 'error':
+                        $('.mask').show();
+                        alert(data.msg);
+                        break;
+                    default:
+                        alert('Error');
+                        break;
+                }
+            };
+
+            websocket.onerror = function(e){
+                alert('Error');
+            };
         },3000);
     },
     //黑客雨

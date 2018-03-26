@@ -12,3 +12,4 @@ php server.php<br>
 \lib\WebResponse.php文件中可以设置登录账户密码
 # 描述
 一个账户重复登录，仅以最新登录为准，之前登录的连接会被删除。
+
